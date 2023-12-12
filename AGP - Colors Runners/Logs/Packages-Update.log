@@ -1,0 +1,11 @@
+
+=== Tue Dec 12 19:35:46 2023
+
+Packages were changed.
+Update Mode: mergeDefaultDependencies
+
+The following packages were added:
+  com.unity.collab-proxy@1.17.1
+  com.unity.visualscripting@1.7.8
+The following packages were updated:
+  com.unity.render-pipelines.universal from version 12.1.6 to 12.1.7
