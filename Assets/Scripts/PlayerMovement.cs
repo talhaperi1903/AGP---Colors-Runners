@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -9,6 +10,12 @@ public class PlayerMovement : MonoBehaviour
     private float velocity;
     private Camera maincam;
     public float roadEndPoint;
+
+    public Text bodyCountText; // Reference to the UI Text component
+    private int bodyCount = 0; // Variable to store the body count
+
+
+    public Material playerMaterial; // Add this line
 
     private Transform player;
     private Vector3 firstMousepos, firstPlayerpos;
@@ -30,11 +37,12 @@ public class PlayerMovement : MonoBehaviour
     private List<Vector3> PositionHistory = new List<Vector3>();
 
 
+
     void Start()
     {
-        maincam=Camera.main;
-        player=this.transform;
-        
+        maincam = Camera.main;
+        player = this.transform;
+        UpdateBodyCountText(); // Call the method to update the UI Text initially
     }
 
     // Update is called once per frame
@@ -65,6 +73,29 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
+    public void ChangeColor(Color newColor)
+    {
+        // Check if the playerMaterial has a Renderer
+        if (playerMaterial != null)
+        {
+            playerMaterial.color = newColor; // Change the player's color
+        }
+
+        // Change the color of all body parts
+        foreach (var body in bodyparts)
+        {
+            Renderer bodyRenderer = body.GetComponent<Renderer>();
+
+            // Check if the body part has a Renderer
+            if (bodyRenderer != null)
+            {
+                bodyRenderer.material.color = newColor;
+            }
+        }
+    }
+
+
+
     private void FixedUpdate()
     {
         player.position += Vector3.forward * playerZSpeed * Time.fixedDeltaTime;
@@ -94,8 +125,18 @@ public class PlayerMovement : MonoBehaviour
         int index = 0;
         index++;
         bodyPartsIndex.Add(index);
+
+        bodyCount++; // Increment the body count
+        UpdateBodyCountText(); // Update the UI Text
     }
 
+    private void UpdateBodyCountText()
+    {
+        if (bodyCountText != null)
+        {
+            bodyCountText.text = "Score: " + bodyCount.ToString();
+        }
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag=="PlayerObs")

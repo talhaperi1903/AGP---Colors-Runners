@@ -95,7 +95,7 @@ namespace HyperCasual.Runner
                     break;
 
                 case GateType.ChangeColor:
-                    PlayerController.Instance.ChangeColor(m_Color);
+                    PlayerController.Instance.GetComponent<PlayerMovement>().ChangeColor(m_Color);
                     break;
             }
 
