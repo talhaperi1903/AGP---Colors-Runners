@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Shared\Scripts\LevelCompletedEvent.cs" />
+    <Compile Include="Assets\Scripts\ObstacleScript.cs" />
     <Compile Include="Assets\Core\Scripts\StateMachine\LoadSceneState.cs" />
     <Compile Include="Assets\Scripts\LoadLevelFromDef.cs" />
     <Compile Include="Assets\Core\Scripts\StateMachine\Link.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Assets\Core\Scripts\StateMachine\PauseState.cs" />
     <Compile Include="Assets\Shared\Scripts\Inventory.cs" />
     <Compile Include="Assets\Core\Scripts\EventSystem\IGameEventListener.cs" />
+    <Compile Include="Assets\Generated\ColorChanger.cs" />
     <Compile Include="Assets\Core\Scripts\StateMachine\StateMachine.cs" />
     <Compile Include="Assets\Core\Scripts\StateMachine\DelayState.cs" />
     <Compile Include="Assets\Core\Scripts\Utils\PlayerPrefUtils.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Assets\Scripts\ScorePlayer.cs" />
     <Compile Include="Assets\Shared\Scripts\UI\SettingsMenu.cs" />
     <Compile Include="Assets\Scripts\Collectable.cs" />
+    <Compile Include="Assets\Scripts\PlayerObsScript.cs" />
     <Compile Include="Assets\Shared\Scripts\HyperCasualButton.cs" />
     <Compile Include="Assets\Scripts\SaveManager.cs" />
     <Compile Include="Assets\Core\Scripts\StateMachine\ILink.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="Assets\Shared\Scripts\ItemPickupTrigger.cs" />
     <Compile Include="Assets\Scripts\TerrainGenerator.cs" />
     <Compile Include="Assets\Scripts\FinishLine.cs" />
+    <Compile Include="Assets\Scripts\ButtonScript.cs" />
     <Compile Include="Assets\Shared\Scripts\UI\PauseMenu.cs" />
     <Compile Include="Assets\Core\Scripts\StateMachine\AbstractState.cs" />
     <Compile Include="Assets\Shared\Scripts\GenericGameEventListener.cs" />
@@ -125,28 +129,60 @@
     <Compile Include="Assets\Scripts\CameraManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Core.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Universal2D\Setup.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\DepthOnly\Data.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\DepthNormals\ProgramDepthNormals.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Lighting.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\DepthNormals\Data.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\URP\Standard\StandardSimple.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Forward\BaseSetup.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Surface.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Universal2D\ProgramUniversal2D.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Forward\ProgramForward.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\DepthOnly\ProgramDepthOnly.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\ShadowCaster\Data.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Meta\Setup.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Common.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Universal2D\Data.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Outline\Setup.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\ShadowCaster\ProgramShadowCaster.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Pipeline.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\ShadowCaster\Setup.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Meta\Data.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Forward\Data.hlsl" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Outline\Data.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\URP\Standard\StandardSimpleOutline.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Meta\Common.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\Unity.Hypercasual.asmdef" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Uniform.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\DepthNormals\Setup.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Composite.hlsl" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\DepthOnly\Setup.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Config.hlsl" />
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Meta\ProgramMeta.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\_MK\MKToon\Shader\Lib\Outline\ProgramOutline.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

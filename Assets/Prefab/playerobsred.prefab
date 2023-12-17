@@ -42,6 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7530600867305056105}
   - component: {fileID: 7530600867305056102}
+  - component: {fileID: 7020526927011755726}
   m_Layer: 0
   m_Name: playerobsred
   m_TagString: PlayerObs
@@ -79,6 +80,19 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &7020526927011755726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7530600867305056104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 685b9140eb5d7d8429721096e1322151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: c717af60370362645b2f89e66fc45dc9, type: 2}
 --- !u!1 &7530600867325184508
 GameObject:
   m_ObjectHideFlags: 0
@@ -1177,7 +1191,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bb54ca769e228ba4cae1ec695f44c04a, type: 2}
+  - {fileID: 2100000, guid: c717af60370362645b2f89e66fc45dc9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

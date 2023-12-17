@@ -1,32 +1,26 @@
-using System.Collections;
+using HyperCasual.Runner;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float speed;
-    private float velocity;
-    private Camera maincam;
-    public float roadEndPoint;
 
-    public Text bodyCountText; // Reference to the UI Text component
-    private int bodyCount = 0; // Variable to store the body count
+    public Text bodyCountText;
+    public int bodyCount = 0;
+    public Material playerMaterial;
+    public GameObject playerMesh; // Player'ýn mesh'ini belirtin
 
 
-    public Material playerMaterial; // Add this line
+    public GameObject finishArea; // Finish alanýný belirtin
+    private bool isFinished = false; // Player'ýn finish alanýna ulaþýp ulaþmadýðýný kontrol etmek için
+    private PlayerController playerController; // PlayerController referansýnýz
 
-    private Transform player;
-    private Vector3 firstMousepos, firstPlayerpos;
-    private bool moveTheBall;
-
-
-    private float camVelocity;
-    public float camSpeed = 0.4f;
-    private Vector3 offset;
-
-    public float playerZSpeed = 15f;
+    public GameObject buildingModel; // Bina modelini belirtin
+    public Material buildingMaterial; // Bina modelinin malzemesini belirtin
+    public Color lockedColor = Color.black; // Kilitli renk
+    public Color unlockedColor = Color.white; // Kilitsiz renk
+    public int lockValue = 50; // Kilit deðeri
 
     public GameObject bodyPrefab;
     public int gap = 2;
@@ -37,56 +31,74 @@ public class PlayerMovement : MonoBehaviour
     private List<Vector3> PositionHistory = new List<Vector3>();
 
 
-
     void Start()
     {
-        maincam = Camera.main;
-        player = this.transform;
-        UpdateBodyCountText(); // Call the method to update the UI Text initially
+        playerController = GetComponent<PlayerController>();
+        //buildingMaterial.color = lockedColor;
+
+
+        UpdateBodyCountText();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
-        {
-            moveTheBall = true;
 
-        }else if(Input.GetMouseButtonUp(0))
+        if (isFinished)
         {
-            moveTheBall= false;
+            //playerController.CancelMovement(); // PlayerController'daki durma fonksiyonunu çaðýrýn
+            DestroyBodies();
+            GrowPlayer();
+            //// Player'ýn hýzýný sýfýrla
+            //// Player'ýn body count birer birer azalarak 0'a kadar getir
+            //while (bodyCount > 0)
+            //{
+            //    ShrinkBody();
+            //    lockValue -= 1;
+            //}  
+
+            //// Kilit sayýsý ile body count'u oranlayýp bina modelinin rengini eski hale getir
+            //float ratio = (float)bodyCount / lockValue;
+            //buildingMaterial.color = Color.Lerp(lockedColor, unlockedColor, ratio);
+
+            //// Kilit ile bodycount ayný sayý olursa tüm rengi gözükmesini saðla
+            //if (lockValue == bodyCount)
+            //{
+            //    buildingMaterial.color = unlockedColor;
+            //}
+
         }
 
-        if(moveTheBall)
-        {
-            Plane newplane= new Plane(Vector3.up,0.8f);
-            Ray ray=maincam.ScreenPointToRay(Input.mousePosition);
 
-            if(newplane.Raycast(ray,out var distance))
-            {
-                Vector3 newmousepos = ray.GetPoint(distance) - firstMousepos;
-                Vector3 newplayerpos = newmousepos + firstPlayerpos;
-                newplayerpos.x = Mathf.Clamp(newplayerpos.x, -roadEndPoint, roadEndPoint);
-                player.position = new Vector3(Mathf.SmoothDamp(player.position.x, newplayerpos.x, ref velocity, speed), player.position.y, player.position.x);
-            }
-        }
-        
     }
+
+    public void ResetBody()
+    {
+        // Destroy all body parts
+        foreach (var body in bodyparts)
+        {
+            Destroy(body);
+        }
+
+        // Clear lists and reset body count
+        bodyparts.Clear();
+        bodyPartsIndex.Clear();
+        bodyCount = 0;
+
+        UpdateBodyCountText(); // Update the UI Text
+    }
+
 
     public void ChangeColor(Color newColor)
     {
-        // Check if the playerMaterial has a Renderer
         if (playerMaterial != null)
         {
             playerMaterial.color = newColor; // Change the player's color
         }
 
-        // Change the color of all body parts
         foreach (var body in bodyparts)
         {
             Renderer bodyRenderer = body.GetComponent<Renderer>();
 
-            // Check if the body part has a Renderer
             if (bodyRenderer != null)
             {
                 bodyRenderer.material.color = newColor;
@@ -95,10 +107,8 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-
     private void FixedUpdate()
     {
-        player.position += Vector3.forward * playerZSpeed * Time.fixedDeltaTime;
         PositionHistory.Insert(0, transform.position);
         int index = 0;
         foreach (var body in bodyparts)
@@ -111,12 +121,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
-    {
-        Vector3 newcampos = maincam.transform.position;
-        maincam.transform.position = new Vector3(Mathf.SmoothDamp(newcampos.x, player.position.x, ref camVelocity, camSpeed),
-            newcampos.y, player.position.z + offset.z);
-    }
+    
 
     public void GrowBody()
     {
@@ -134,15 +139,84 @@ public class PlayerMovement : MonoBehaviour
     {
         if (bodyCountText != null)
         {
-            bodyCountText.text = "Score: " + bodyCount.ToString();
+            bodyCountText.text = bodyCount.ToString();
         }
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag=="PlayerObs")
+        // Player'ýn finish alanýna ulaþýp ulaþmadýðýný kontrol et
+        if (other.gameObject == finishArea)
         {
-            Destroy(other.gameObject,0.005f);
-            GrowBody();
+            isFinished = true;
+        }
+
+        // Player'ýn bir "PlayerObs" ile çarpýþýp çarpýþmadýðýný kontrol et
+        else if (other.gameObject.tag == "PlayerObs")
+        {
+            PlayerObsScript playerObsScript = other.gameObject.GetComponent<PlayerObsScript>();
+
+            if (playerObsScript != null && playerMaterial != null)
+            {
+                if (playerObsScript.material.color == playerMaterial.color)
+                {
+                    Destroy(other.gameObject, 0.005f);
+                    GrowBody();
+                }
+                else
+                {
+                    ShrinkBody();
+                }
+            }
         }
     }
+
+
+    // Tüm body'leri player ile birleþtir
+    private void CombineBodies()
+    {
+        foreach (var body in bodyparts)
+        {
+            body.transform.position = transform.position;
+        }
+    }
+
+    private void DestroyBodies()
+    {
+        foreach (var body in bodyparts)
+        {
+            Destroy(body);
+        }
+        bodyparts.Clear();
+    }
+
+    // Player'ýn boyutunu artýr
+    public void GrowPlayer()
+    {
+        playerMesh.transform.localScale = new Vector3(2, 2, 2);
+    }
+    public void ShrinkBody()
+    {
+        if (bodyCount > 0)
+        {
+            int lastIndex = bodyparts.Count - 1;
+
+            if (lastIndex >= 0)
+            {
+                Destroy(bodyparts[lastIndex]);
+                bodyparts.RemoveAt(lastIndex);
+                bodyPartsIndex.RemoveAt(lastIndex);
+                bodyCount--;
+
+                UpdateBodyCountText(); 
+            }
+        }
+    }
+
+
+
+
+    
+
+
+
 }

@@ -4,12 +4,7 @@ using UnityEngine;
 
 namespace HyperCasual.Runner
 {
-    /// <summary>
-    /// A class representing a Spawnable object.
-    /// If a GameObject tagged "Player" collides
-    /// with this object, it will trigger a fail
-    /// state with the GameManager.
-    /// </summary>
+    
     public class Gate : Spawnable
     {
         const string k_PlayerTag = "Player";
@@ -34,14 +29,7 @@ namespace HyperCasual.Runner
             ChangeColor,  // Added line for ChangeColor
         }
 
-        /// <summary>
-        /// Sets the local scale of this spawnable object
-        /// and ensures the Text attached to this gate
-        /// does not scale.
-        /// </summary>
-        /// <param name="scale">
-        /// The scale to apply to this spawnable object.
-        /// </param>
+       
         public override void SetScale(Vector3 scale)
         {
             // Ensure the text does not get scaled
@@ -55,10 +43,7 @@ namespace HyperCasual.Runner
             }
         }
 
-        /// <summary>
-        /// Reset the gate to its initial state. Called when a level
-        /// is restarted by the GameManager.
-        /// </summary>
+       
         public override void ResetSpawnable()
         {
             m_Applied = false;
