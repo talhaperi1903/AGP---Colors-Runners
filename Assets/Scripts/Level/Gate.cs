@@ -17,6 +17,7 @@ namespace HyperCasual.Runner
         Color m_Color;  // Added line for color
         [SerializeField]
         RectTransform m_Text;
+
         
 
         bool m_Applied;

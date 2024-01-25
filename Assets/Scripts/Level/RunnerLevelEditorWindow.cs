@@ -407,8 +407,10 @@ namespace HyperCasual.Runner
 
             m_LevelParentGO = new GameObject(k_LevelParentGameObjectName);
             m_LevelParentGO.tag = s_LevelParentTag;
-
-            GameManager.LoadLevel(m_LoadedLevelDefinition, ref m_LoadedLevelGO);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadLevel(m_LoadedLevelDefinition, ref m_LoadedLevelGO);
+            }
             GameManager.CreateTerrain(m_LoadedLevelDefinition, ref m_TerrainGO);
             GameManager.PlaceLevelMarkers(m_LoadedLevelDefinition, ref m_LevelMarkersGO);
 

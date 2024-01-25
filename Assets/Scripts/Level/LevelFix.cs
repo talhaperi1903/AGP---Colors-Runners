@@ -14,9 +14,12 @@ namespace HyperCasual.Runner
 
         void Start()
         {
-            gameManager.LoadLevel(levelDef);
-        }
+            // Create or reference a GameObject that will hold the loaded level
+            GameObject levelContainer = new GameObject("LevelContainer");
 
+            // Pass both the LevelDefinition and the reference to the GameObject to LoadLevel
+            gameManager.LoadLevel(levelDef, ref levelContainer);
+        }
     }
 }
 #endif

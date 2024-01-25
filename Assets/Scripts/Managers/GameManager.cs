@@ -9,43 +9,33 @@ using UnityEditor;
 
 namespace HyperCasual.Runner
 {
-    /// <summary>
-    /// A class used to store game state information, 
-    /// load levels, and save/load statistics as applicable.
-    /// The GameManager class manages all game-related 
-    /// state changes.
-    /// </summary>
     public class GameManager : MonoBehaviour
     {
-        /// <summary>
-        /// Returns the GameManager.
-        /// </summary>
         public static GameManager Instance => s_Instance;
-        static GameManager s_Instance;
+        private static GameManager s_Instance;
 
         [SerializeField]
-        AbstractGameEvent m_WinEvent;
+        private AbstractGameEvent m_WinEvent;
 
         [SerializeField]
-        AbstractGameEvent m_LoseEvent;
+        private AbstractGameEvent m_LoseEvent;
 
-        LevelDefinition m_CurrentLevel;
-
-        /// <summary>
-        /// Returns true if the game is currently active.
-        /// Returns false if the game is paused, has not yet begun,
-        /// or has ended.
-        /// </summary>
+        private LevelDefinition m_CurrentLevel;
         public bool IsPlaying => m_IsPlaying;
-        bool m_IsPlaying;
-        GameObject m_CurrentLevelGO;
-        GameObject m_CurrentTerrainGO;
-        GameObject m_LevelMarkersGO;
+        private bool m_IsPlaying;
+        private GameObject m_CurrentLevelGO;
+        private GameObject m_CurrentTerrainGO;
+        private GameObject m_LevelMarkersGO;
 
-        List<Spawnable> m_ActiveSpawnables = new List<Spawnable>();
+        // Dependencies injected through properties or constructor
+        public LevelManager LevelManager { get; set; }
+        public PlayerController PlayerController { get; set; }
+        public CameraManager CameraManager { get; set; }
+
+        private List<Spawnable> m_ActiveSpawnables = new List<Spawnable>();
 
 #if UNITY_EDITOR
-        bool m_LevelEditorMode;
+        private bool m_LevelEditorMode;
 #endif
 
         void Awake()
@@ -59,8 +49,7 @@ namespace HyperCasual.Runner
             s_Instance = this;
 
 #if UNITY_EDITOR
-            // If LevelManager already exists, user is in the LevelEditorWindow
-            if (LevelManager.Instance != null)
+            if (LevelManager != null)
             {
                 StartGame();
                 m_LevelEditorMode = true;
@@ -68,125 +57,21 @@ namespace HyperCasual.Runner
 #endif
         }
 
-        /// <summary>
-        /// This method calls all methods necessary to load and
-        /// instantiate a level from a level definition.
-        /// </summary>
-        public void LoadLevel(LevelDefinition levelDefinition)
+        public void LoadLevel(LevelDefinition levelDefinition, ref GameObject levelGameObject)
+
         {
             m_CurrentLevel = levelDefinition;
-            LoadLevel(m_CurrentLevel, ref m_CurrentLevelGO);
+            LevelManager?.LoadLevel(levelDefinition, ref m_CurrentLevelGO);
             CreateTerrain(m_CurrentLevel, ref m_CurrentTerrainGO);
             PlaceLevelMarkers(m_CurrentLevel, ref m_LevelMarkersGO);
             StartGame();
         }
 
-        /// <summary>
-        /// This method calls all methods necessary to restart a level,
-        /// including resetting the player to their starting position
-        /// </summary>
         public void ResetLevel()
         {
-            if (PlayerController.Instance != null)
-            {
-                PlayerController.Instance.ResetPlayer();
-            }
-
-            if (CameraManager.Instance != null)
-            {
-                CameraManager.Instance.ResetCamera();
-            }
-
-            if (LevelManager.Instance != null)
-            {
-                LevelManager.Instance.ResetSpawnables();
-            }
-        }
-
-        /// <summary>
-        /// This method loads and instantiates the level defined in levelDefinition,
-        /// storing a reference to its parent GameObject in levelGameObject
-        /// </summary>
-        /// <param name="levelDefinition">
-        /// A LevelDefinition ScriptableObject that holds all information needed to 
-        /// load and instantiate a level.
-        /// </param>
-        /// <param name="levelGameObject">
-        /// A new GameObject to be created, acting as the parent for the level to be loaded
-        /// </param>
-        public static void LoadLevel(LevelDefinition levelDefinition, ref GameObject levelGameObject)
-        {
-            if (levelDefinition == null)
-            {
-                Debug.LogError("Invalid Level!");
-                return;
-            }
-
-            if (levelGameObject != null)
-            {
-                if (Application.isPlaying)
-                {
-                    Destroy(levelGameObject);
-                }
-                else
-                {
-                    DestroyImmediate(levelGameObject);
-                }
-            }
-
-            levelGameObject = new GameObject("LevelManager");
-            LevelManager levelManager = levelGameObject.AddComponent<LevelManager>();
-            levelManager.LevelDefinition = levelDefinition;
-
-            Transform levelParent = levelGameObject.transform;
-
-            for (int i = 0; i < levelDefinition.Spawnables.Length; i++)
-            {
-                LevelDefinition.SpawnableObject spawnableObject = levelDefinition.Spawnables[i];
-
-                if (spawnableObject.SpawnablePrefab == null)
-                {
-                    continue;
-                }
-
-                Vector3 position = spawnableObject.Position;
-                Vector3 eulerAngles = spawnableObject.EulerAngles;
-                Vector3 scale = spawnableObject.Scale;
-
-                GameObject go = null;
-                
-                if (Application.isPlaying)
-                {
-                    go = GameObject.Instantiate(spawnableObject.SpawnablePrefab, position, Quaternion.Euler(eulerAngles));
-                }
-                else
-                {
-#if UNITY_EDITOR
-                    go = (GameObject)PrefabUtility.InstantiatePrefab(spawnableObject.SpawnablePrefab);
-                    go.transform.position = position;
-                    go.transform.eulerAngles = eulerAngles;
-#endif
-                }
-
-                if (go == null)
-                {
-                    return;
-                }
-
-                // Set Base Color
-                Spawnable spawnable = go.GetComponent<Spawnable>();
-                if (spawnable != null)
-                {
-                    spawnable.SetBaseColor(spawnableObject.BaseColor);
-                    spawnable.SetScale(scale);
-                    levelManager.AddSpawnable(spawnable);
-                }
-
-                if (go != null)
-                {
-                    go.transform.SetParent(levelParent);
-                }
-            }
+            PlayerController?.ResetPlayer();
+            CameraManager?.ResetCamera();
+            LevelManager?.ResetSpawnables();
         }
 
         public void UnloadCurrentLevel()
@@ -209,11 +94,12 @@ namespace HyperCasual.Runner
             m_CurrentLevel = null;
         }
 
-        void StartGame()
+        private void StartGame()
         {
             ResetLevel();
             m_IsPlaying = true;
         }
+
 
         /// <summary>
         /// Creates and instantiates the StartPrefab and EndPrefab defined inside
@@ -283,25 +169,23 @@ namespace HyperCasual.Runner
         public void Win()
         {
             m_WinEvent.Raise();
-
-#if UNITY_EDITOR
-            if (m_LevelEditorMode)
-            {
-                ResetLevel();
-            }
-#endif
+            HandleEditorMode();
         }
 
         public void Lose()
         {
             m_LoseEvent.Raise();
+            HandleEditorMode();
+        }
 
 #if UNITY_EDITOR
+        private void HandleEditorMode()
+        {
             if (m_LevelEditorMode)
             {
                 ResetLevel();
             }
-#endif
         }
+#endif
     }
 }

@@ -4,55 +4,45 @@ using UnityEngine;
 
 namespace HyperCasual.Runner
 {
-    /// <summary>
-    /// A class used to hold a reference to the current
-    /// level and provide access to other classes.
-    /// </summary>
     [ExecuteInEditMode]
     public class LevelManager : MonoBehaviour
     {
-        /// <summary>
-        /// Returns the LevelManager.
-        /// </summary>
+        [SerializeField]
+        private LevelDefinition m_LevelDefinition;
+
+        private List<Spawnable> m_ActiveSpawnables = new List<Spawnable>();
+
         public static LevelManager Instance => s_Instance;
         static LevelManager s_Instance;
 
-        /// <summary>
-        /// Returns the LevelDefinition used to create this LevelManager.
-        /// </summary>
+        public PlayerController PlayerController { get; set; }
+
         public LevelDefinition LevelDefinition
         {
             get => m_LevelDefinition;
-            set 
+            set
             {
                 m_LevelDefinition = value;
-
-                if (m_LevelDefinition != null && PlayerController.Instance != null)
+                if (m_LevelDefinition != null && PlayerController != null)
                 {
-                    PlayerController.Instance.SetMaxXPosition(m_LevelDefinition.LevelWidth);
+                    PlayerController.SetMaxXPosition(m_LevelDefinition.LevelWidth);
                 }
             }
         }
-        LevelDefinition m_LevelDefinition;
 
-        List<Spawnable> m_ActiveSpawnables = new List<Spawnable>();
-
-        /// <summary>
-        /// Call this method to add a Spawnable to the list of active Spawnables.
-        /// </summary>
         public void AddSpawnable(Spawnable spawnable)
         {
-            m_ActiveSpawnables.Add(spawnable);
+            if (spawnable != null)
+            {
+                m_ActiveSpawnables.Add(spawnable);
+            }
         }
 
-        /// <summary>
-        /// Calling this method calls the Reset() method on all Spawnables in this level.
-        /// </summary>
         public void ResetSpawnables()
         {
-            for (int i = 0, c = m_ActiveSpawnables.Count; i < c; i++)
+            foreach (var spawnable in m_ActiveSpawnables)
             {
-                m_ActiveSpawnables[i].ResetSpawnable();
+                spawnable.ResetSpawnable();
             }
         }
 
@@ -64,6 +54,21 @@ namespace HyperCasual.Runner
         void OnEnable()
         {
             SetupInstance();
+        }
+        public void LoadLevel(LevelDefinition levelDefinition, ref GameObject levelGameObject)
+        {
+            // Set the current level definition
+            LevelDefinition = levelDefinition;
+
+            // If a level game object already exists, destroy it
+            if (levelGameObject != null)
+            {
+                Destroy(levelGameObject);
+            }
+
+            // Create a new level game object
+            levelGameObject = new GameObject("Level");
+
         }
 
         void SetupInstance()

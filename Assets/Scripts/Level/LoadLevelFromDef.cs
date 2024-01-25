@@ -21,7 +21,7 @@ namespace HyperCasual.Runner
             m_ManagerPrefabs = managerPrefabs;
             m_SceneController = sceneController;
         }
-        
+
         public override IEnumerator Execute()
         {
             if (m_LevelDefinition == null)
@@ -35,7 +35,14 @@ namespace HyperCasual.Runner
                 Object.Instantiate(prefab);
             }
 
-            GameManager.Instance.LoadLevel(m_LevelDefinition);
+            // Create a new GameObject to serve as the container for the level
+            GameObject levelContainer = new GameObject("LevelContainer");
+
+            // Pass the LevelDefinition and the reference to the level container GameObject to LoadLevel
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.LoadLevel(m_LevelDefinition, ref levelContainer);
+            }
         }
     }
 }
