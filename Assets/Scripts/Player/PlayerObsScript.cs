@@ -1,29 +1,51 @@
 using UnityEngine;
 
-public class PlayerObsScript : MonoBehaviour
+// Interface to abstract the functionality for material handling
+public interface IMaterialService
 {
-    public Material material; // Bu PlayerObs nesnesinin materyali
+    void ApplyMaterial(Renderer renderer, Material material);
+    Color GetMaterialColor(Material material);
+}
 
-    void Start()
+// Concrete implementation of the material service
+public class MaterialService : IMaterialService
+{
+    public void ApplyMaterial(Renderer renderer, Material material)
     {
-        // Materyali baþlat
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        if (renderer != null && material != null)
         {
             renderer.material = material;
         }
     }
 
+    public Color GetMaterialColor(Material material)
+    {
+        return material != null ? material.color : Color.clear;
+    }
+}
+
+public class PlayerObsScript : MonoBehaviour
+{
+    public Material material; // This material should be set in the Unity Editor.
+
+    private IMaterialService _materialService;
+
+    void Awake()
+    {
+        // Dependency injection (could also be done via a constructor or a DI framework)
+        _materialService = new MaterialService();
+    }
+
+    void Start()
+    {
+        // Apply material using the material service
+        Renderer renderer = GetComponent<Renderer>();
+        _materialService.ApplyMaterial(renderer, material);
+    }
+
     public Color GetColor()
     {
-        // Materyalin rengini döndür
-        if (material != null)
-        {
-            return material.color;
-        }
-        else
-        {
-            return Color.clear; // Materyal atanmamýþsa, þeffaf bir renk döndür
-        }
+        // Retrieve material color using the material service
+        return _materialService.GetMaterialColor(material);
     }
 }

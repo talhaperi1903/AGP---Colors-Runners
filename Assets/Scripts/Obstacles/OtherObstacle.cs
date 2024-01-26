@@ -4,36 +4,28 @@ using UnityEngine;
 
 public class OtherObstacle : MonoBehaviour
 {
-    public Renderer obstacleRenderer1; // Ýnspektörde birinci düzlemin renderer'ýný ata
-
-   
+    public Renderer obstacleRenderer1; // Assign the renderer of the first plane in the Inspector
+    public IObstacleInteractionHandler obstacleInteractionHandler;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
+            // Player'ýn Renderer'ýný alýn, playerMaterial'i almak için
+            Material playerMaterial = other.GetComponent<Renderer>()?.material;
 
-            if (playerMovement != null && playerMovement.playerMaterial != null)
+            if (playerMaterial != null)
             {
-                // Oyuncu ve engel düzlemlerinin malzemelerini al
-                Material playerMaterial = playerMovement.playerMaterial;
                 Material obstacleMaterial1 = obstacleRenderer1.material;
 
                 // Malzemeleri karþýlaþtýr
-                if (playerMaterial.color == obstacleMaterial1.color)
-                {
-
-                }
-                else
+                if (!obstacleInteractionHandler.CompareColors(playerMaterial, obstacleMaterial1))
                 {
                     // Engelle ve oyuncu farklý renkte, oyuncunun vücudu küçültülecek
-                    playerMovement.ResetBody();
-
+                    obstacleInteractionHandler.ResetPlayerBody();
                 }
             }
-
         }
-
     }
 }
+

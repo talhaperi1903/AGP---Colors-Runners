@@ -3,223 +3,221 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerMovement : MonoBehaviour
+public interface IBodyManager
 {
+    void GrowBody(GameObject bodyPrefab, Transform playerTransform);
+    void ShrinkBody();
+    void ResetBody();
+    int BodyCount { get; }
+    void UpdateBodyCountText(Text bodyCountText);
+}
 
-    public Text bodyCountText;
-    public int bodyCount = 0;
-    public Material playerMaterial;
-    public GameObject playerMesh; // Player'ýn mesh'ini belirtin
-    public float moveSpeed = 5f; // Hareket hýzý
-    public DynamicJoystick dynamicJoystick; // Dinamik joystick referansý
+public interface IColorManager
+{
+    void ChangeColor(Material playerMaterial, Color newColor, List<GameObject> bodyParts);
+}
 
-
-
-    public GameObject finishArea; // Finish alanýný belirtin
-    private bool isFinished = false; // Player'ýn finish alanýna ulaþýp ulaþmadýðýný kontrol etmek için
-    private bool isBanklock = false; // Player'ýn finish alanýna ulaþýp ulaþmadýðýný kontrol etmek için
-    public GameObject BankLockarea; // Finish alanýný belirtin
-
-    private PlayerController playerController; // PlayerController referansýnýz
-
-
-    public GameObject buildingModel; // Bina modelini belirtin
-    public Material buildingMaterial; // Bina modelinin malzemesini belirtin
-    public Color lockedColor = Color.black; // Kilitli renk
-    public Color unlockedColor = Color.white; // Kilitsiz renk
-    public int lockValue = 50; // Kilit deðeri
-
-    public GameObject bodyPrefab;
-    public int gap = 2;
-    public float bodyspeed = 15f;
-
-    private List<GameObject> bodyparts = new List<GameObject>();
-    private List<int> bodyPartsIndex = new List<int>();
-    private List<Vector3> PositionHistory = new List<Vector3>();
+public interface IInteractionHandler
+{
+    void HandleFinishArea(ref bool isFinished);
+    void HandleBankLockArea(ref bool isBankLock, PlayerController playerController);
+    // Update the method signature to include the additional parameters
+    void HandlePlayerObs(GameObject other, Material playerMaterial, IBodyManager bodyManager, GameObject bodyPrefab, Transform playerTransform);
+}
 
 
-    void Start()
+public class BodyManager : IBodyManager
+{
+    private List<GameObject> bodyParts = new List<GameObject>();
+    private int bodyCount = 0;
+
+    public int BodyCount => bodyCount;
+
+    public void GrowBody(GameObject bodyPrefab, Transform playerTransform)
     {
-        playerController = GetComponent<PlayerController>();
-        //buildingMaterial.color = lockedColor;
-
-        UpdateBodyCountText();
+        var body = GameObject.Instantiate(bodyPrefab, playerTransform.position, playerTransform.rotation);
+        bodyParts.Add(body);
+        bodyCount++;
     }
 
-    void Update()
+    public void ShrinkBody()
     {
-        if (isFinished)
+        if (bodyParts.Count > 0)
         {
-            DestroyBodies();
-            GrowPlayer();
-
-           
+            GameObject lastBodyPart = bodyParts[bodyParts.Count - 1];
+            GameObject.Destroy(lastBodyPart);
+            bodyParts.RemoveAt(bodyParts.Count - 1);
+            bodyCount--;
         }
     }
 
     public void ResetBody()
     {
-        // Destroy all body parts
-        foreach (var body in bodyparts)
+        foreach (var body in bodyParts)
         {
-            Destroy(body);
+            GameObject.Destroy(body);
         }
-
-        // Clear lists and reset body count
-        bodyparts.Clear();
-        bodyPartsIndex.Clear();
+        bodyParts.Clear();
         bodyCount = 0;
-
-        UpdateBodyCountText(); // Update the UI Text
     }
 
-
-    public void ChangeColor(Color newColor)
-    {
-        if (playerMaterial != null)
-        {
-            playerMaterial.color = newColor; // Change the player's color
-        }
-
-        foreach (var body in bodyparts)
-        {
-            Renderer bodyRenderer = body.GetComponent<Renderer>();
-
-            if (bodyRenderer != null)
-            {
-                bodyRenderer.material.color = newColor;
-            }
-        }
-    }
-
-
-    private void FixedUpdate()
-    {
-        PositionHistory.Insert(0, transform.position);
-        int index = 0;
-        foreach (var body in bodyparts)
-        {
-            Vector3 point = PositionHistory[Mathf.Min(index * gap, PositionHistory.Count - 1)];
-            Vector3 moveDir = point - body.transform.position;
-            body.transform.position += moveDir * bodyspeed * Time.fixedDeltaTime;
-            body.transform.LookAt(point);
-            index++;
-        }
-    }
-
-    
-
-    public void GrowBody()
-    {
-        GameObject body = Instantiate(bodyPrefab, transform.position, transform.rotation);
-        bodyparts.Add(body);
-        int index = 0;
-        index++;
-        bodyPartsIndex.Add(index);
-
-        bodyCount++; // Increment the body count
-        UpdateBodyCountText(); // Update the UI Text
-    }
-
-    public void UpdateBodyCountText()
+    public void UpdateBodyCountText(Text bodyCountText)
     {
         if (bodyCountText != null)
         {
             bodyCountText.text = bodyCount.ToString();
         }
     }
-    private void OnTriggerEnter(Collider other)
+}
+
+public class ColorManager : IColorManager
+{
+    public void ChangeColor(Material playerMaterial, Color newColor, List<GameObject> bodyParts)
     {
-
-        // Player'ýn finish alanýna ulaþýp ulaþmadýðýný kontrol et
-        if (other.gameObject == finishArea)
+        if (playerMaterial != null)
         {
-            isFinished = true;
-
-            Debug.Log("Player reached the finish area!");
-
-           
+            playerMaterial.color = newColor;
         }
 
-
-        if (other.gameObject == BankLockarea)
+        foreach (var part in bodyParts)
         {
-            isBanklock = true;
-            playerController.enabled = false;
-            playerController.StopAnimation();
-
-            Debug.Log("Player reached the Bank Lock area!");
-
-        }
-
-
-        // Player'ýn bir "PlayerObs" ile çarpýþýp çarpýþmadýðýný kontrol et
-        else if (other.gameObject.tag == "PlayerObs")
-        {
-            PlayerObsScript playerObsScript = other.gameObject.GetComponent<PlayerObsScript>();
-
-            if (playerObsScript != null && playerMaterial != null)
+            var renderer = part.GetComponent<Renderer>();
+            if (renderer != null)
             {
-                if (playerObsScript.material.color == playerMaterial.color)
-                {
-                    Destroy(other.gameObject, 0.005f);
-                    GrowBody();
-                }
-                else
-                {
-                    ShrinkBody();
-                }
+                renderer.material.color = newColor;
             }
         }
     }
+}
 
-
-    // Tüm body'leri player ile birleþtir
-    private void CombineBodies()
+public class InteractionHandler : IInteractionHandler
+{
+    public void HandleFinishArea(ref bool isFinished)
     {
-        foreach (var body in bodyparts)
+        isFinished = true;
+        // Additional logic for when the player reaches the finish area
+    }
+
+    public void HandleBankLockArea(ref bool isBankLock, PlayerController playerController)
+    {
+        isBankLock = true;
+        playerController.enabled = false;
+        // Additional logic for when the player reaches the bank lock area
+    }
+
+    public void HandlePlayerObs(GameObject other, Material playerMaterial, IBodyManager bodyManager, GameObject bodyPrefab, Transform playerTransform)
+    {
+        var playerObsScript = other.GetComponent<PlayerObsScript>();
+        if (playerObsScript != null && playerMaterial.color == playerObsScript.GetColor())
         {
-            body.transform.position = transform.position;
+            GameObject.Destroy(other, 0.005f); // Destroy the obstacle
+            bodyManager.GrowBody(bodyPrefab, playerTransform); // Grow the player's body with the provided prefab and transform
+        }
+        else
+        {
+            bodyManager.ShrinkBody(); // Shrink the player's body
         }
     }
-
-    private void DestroyBodies()
-    {
-        foreach (var body in bodyparts)
-        {
-            Destroy(body);
-        }
-        bodyparts.Clear();
-    }
-
-    // Player'ýn boyutunu artýr
-    public void GrowPlayer()
-    {
-        playerMesh.transform.localScale = new Vector3(2, 2, 2);
-    }
-    public void ShrinkBody()
-    {
-        if (bodyCount > 0)
-        {
-            int lastIndex = bodyparts.Count - 1;
-
-            if (lastIndex >= 0)
-            {
-                Destroy(bodyparts[lastIndex]);
-                bodyparts.RemoveAt(lastIndex);
-                bodyPartsIndex.RemoveAt(lastIndex);
-                bodyCount--;
-
-                UpdateBodyCountText(); 
-            }
-        }
-    }
-
-
-
-
-    
-
-
 
 }
+
+public class PlayerMovement : MonoBehaviour
+{
+    public Text bodyCountText;
+    public GameObject bodyPrefab;
+    public Material playerMaterial;
+
+    private IBodyManager bodyManager;
+    private IColorManager colorManager;
+    private IInteractionHandler interactionHandler;
+
+
+    private bool isFinished = false;
+    private bool isBankLock = false;
+
+    public GameObject finishArea;
+    public GameObject bankLockArea;
+    private PlayerController playerController;
+
+    public class BuildingLockManager : IBuildingLockManager
+    {
+        private Material buildingMaterial;
+        private Color lockedColor;
+        private Color unlockedColor;
+        private Text lockStatusText;
+        private int lockValue;
+
+        public BuildingLockManager(Material buildingMaterial, Color lockedColor, Color unlockedColor, Text lockStatusText, int lockValue)
+        {
+            this.buildingMaterial = buildingMaterial;
+            this.lockedColor = lockedColor;
+            this.unlockedColor = unlockedColor;
+            this.lockStatusText = lockStatusText;
+            this.lockValue = lockValue;
+        }
+
+        public void UnlockBuilding(int unlockValue)
+        {
+          
+        }
+
+        public void UpdateLockStatusText()
+        {
+            
+        }
+    }
+
+    public void ChangeColor(Color newColor)
+    {
+        // Change the player's color
+        // You might need to access the Renderer component or a specific Material to apply the new color
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = newColor;
+        }
+    }
+    void Awake()
+    {
+        bodyManager = new BodyManager();
+        colorManager = new ColorManager();
+        interactionHandler = new InteractionHandler();
+        playerController = GetComponent<PlayerController>();
+    }
+
+    void Start()
+    {
+        bodyManager.ResetBody();
+    }
+
+    void Update()
+    {
+        if (isFinished)
+        {
+            // Handle game logic for when the player has finished
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject == finishArea)
+        {
+            interactionHandler.HandleFinishArea(ref isFinished);
+        }
+        else if (other.gameObject == bankLockArea)
+        {
+            interactionHandler.HandleBankLockArea(ref isBankLock, playerController);
+        }
+        else if (other.tag == "PlayerObs")
+        {
+            interactionHandler.HandlePlayerObs(other.gameObject, playerMaterial, bodyManager, bodyPrefab, transform);
+
+        }
+    }
+
+    void LateUpdate()
+    {
+        bodyManager.UpdateBodyCountText(bodyCountText);
+    }
+}
+
