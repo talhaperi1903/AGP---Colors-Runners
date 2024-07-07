@@ -46,7 +46,7 @@ https://github.com/talhaperi1903/AGP---Colors-Runners/assets/49415597/68a51917-c
     </td>
   </tr>
   <tr>
-    <td><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="50"/> Naime Yöndem</td>
+    <td><img src="https://avatars.githubusercontent.com/u/6?v=4" width="50"/> Naime Yöndem</td>
     <td>Developer</td>
     <td>
       <a href="https://github.com/onur">GitHub</a> | 
