@@ -13,7 +13,7 @@ https://github.com/talhaperi1903/AGP---Colors-Runners/assets/49415597/68a51917-c
     <th>Socials</th>
   </tr>
   <tr>
-    <td><img src="https://avatars.githubusercontent.com/u/1?v=4" width="50"/> Burak Taha Cevheroğlu</td>
+    <td><img src="https://media.licdn.com/dms/image/D4D03AQHZNwGJOLKBrw/profile-displayphoto-shrink_200_200/0/1712146944360?e=1726099200&v=beta&t=vwZ6rLzcSZioqSJlI8cWA1nZvGUDCcoyjM7odAseN-c" width="50"/> Melike Yiğenoğlu</td>
     <td>Scrum Master</td>
     <td>
       <a href="https://github.com/burak">GitHub</a> | 
@@ -22,7 +22,7 @@ https://github.com/talhaperi1903/AGP---Colors-Runners/assets/49415597/68a51917-c
     </td>
   </tr>
   <tr>
-    <td><img src="https://avatars.githubusercontent.com/u/2?v=4" width="50"/> Arda Demirel</td>
+    <td><img src="https://media.licdn.com/dms/image/D4D03AQE2L5nXfeBWxw/profile-displayphoto-shrink_200_200/0/1698991099785?e=1726099200&v=beta&t=IqvruaIKBkgByj6v34CuNMtgoMBBURQnx6KZd09zYIg" width="50"/> Oğuzhan Gençaslan</td>
     <td>Product Owner</td>
     <td>
       <a href="https://github.com/arda">GitHub</a> | 
@@ -30,7 +30,7 @@ https://github.com/talhaperi1903/AGP---Colors-Runners/assets/49415597/68a51917-c
     </td>
   </tr>
   <tr>
-    <td><img src="https://avatars.githubusercontent.com/u/3?v=4" width="50"/> Dila Hazal Bilgin</td>
+    <td><img src="https://media.licdn.com/dms/image/D4D03AQHaFnGXzHT9GQ/profile-displayphoto-shrink_200_200/0/1709732130539?e=1726099200&v=beta&t=duxxk0xlKL8xemPsaTOqu1yOehh2Uafg8YtfT8bjAy0" width="50"/> Muhammed Talha Peri</td>
     <td>Developer</td>
     <td>
       <a href="https://github.com/dila">GitHub</a> | 
@@ -38,7 +38,7 @@ https://github.com/talhaperi1903/AGP---Colors-Runners/assets/49415597/68a51917-c
     </td>
   </tr>
   <tr>
-    <td><img src="https://avatars.githubusercontent.com/u/4?v=4" width="50"/> Merve Ağacayak</td>
+    <td><img src="https://media.licdn.com/dms/image/D4D03AQE5FIkLdrtpLQ/profile-displayphoto-shrink_200_200/0/1699274020569?e=1726099200&v=beta&t=n5PXzqHotaLn_LW3adapPOGnUq69nMZe4m15anwYX4c" width="50"/> Recep Taha Aydın</td>
     <td>Developer</td>
     <td>
       <a href="https://github.com/merve">GitHub</a> | 
@@ -46,7 +46,7 @@ https://github.com/talhaperi1903/AGP---Colors-Runners/assets/49415597/68a51917-c
     </td>
   </tr>
   <tr>
-    <td><img src="https://avatars.githubusercontent.com/u/5?v=4" width="50"/> Onur Konuk</td>
+    <td><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="50"/> Naime Yöndem</td>
     <td>Developer</td>
     <td>
       <a href="https://github.com/onur">GitHub</a> | 
